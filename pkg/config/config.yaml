@@ -1,8 +1,0 @@
-environment: production
-http_host: localhost
-http_port: 9091
-database_uri: root:@tcp(127.0.0.1:3306)/auction_go?charset=utf8mb4&parseTime=True&loc=Local
-redis_uri: localhost:6379
-redis_password:
-redis_db: 0
-auth_secret: AORgfgbNqOORHHw2INqD6hqUTv5ZKq8b9aXDCOash4dznrg8F4vXjeghucNPeemUasrrz7PuWPGNEnCKdSh5aFBJbTqtibWGot9YD7BBOEDk5YSLz0ljAylERVQarqUA
