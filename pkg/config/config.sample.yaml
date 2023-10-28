@@ -1,0 +1,8 @@
+environment: production
+http_host: localhost
+http_port: 9091
+database_uri: root:pass@tcp(host:port)/database?charset=utf8mb4&parseTime=True&loc=Local
+redis_uri: localhost:6379
+redis_password:
+redis_db: 0
+auth_secret:
