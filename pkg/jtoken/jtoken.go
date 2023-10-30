@@ -28,7 +28,7 @@ func GenerateAccessToken(payload map[string]interface{}) string {
 	jwtToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tokenContent)
 	token, err := jwtToken.SignedString([]byte(cfg.AuthSecret))
 	if err != nil {
-		log.Printf("Failed to generate access token: ", err)
+		log.Println("Failed to generate access token: ", err)
 		return ""
 	}
 
@@ -45,7 +45,7 @@ func GenerateRefreshToken(payload map[string]interface{}) string {
 	jwtToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tokenContent)
 	token, err := jwtToken.SignedString([]byte(cfg.AuthSecret))
 	if err != nil {
-		log.Printf("Failed to generate refresh token: ", err)
+		log.Println("Failed to generate refresh token: ", err)
 		return ""
 	}
 
