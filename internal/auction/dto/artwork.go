@@ -1,20 +1,22 @@
-package model
+package dto
 
 import (
-	"auction/internal/artist/model"
-	"auction/pkg/database"
+	"auction/internal/artist/dto"
+	"time"
 )
 
 type Artwork struct {
-	database.Model
-	AuctionId            string          `json:"auction_id" gorm:"index;not null"`
+	ID                   string          `json:"id"`
+	AuctionId            string          `json:"auction_id"`
 	Title                string          `json:"title"`
 	Description          string          `json:"description"`
 	Status               int             `json:"status"`
+	CreatedAt            time.Time       `json:"created_at"`
+	UpdatedAt            time.Time       `json:"updated_at"`
 	StartPrice           float64         `json:"start_price"`
 	EndPrice             float64         `json:"end_price"`
 	EstimatedMarketPrice float64         `json:"estimated_market_price"`
 	Images               []*ArtworkImage `json:"images"`
 	Bids                 []*Bid          `json:"bids"`
-	Artist               []model.Artist  `json:"artist" gorm:"many2many:artwork_artists;"`
+	Artist               []*dto.Artist   `json:"artist"`
 }

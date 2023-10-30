@@ -17,5 +17,6 @@ func Routes(r *gin.RouterGroup, db database.IDatabase) {
 	route := r.Group("/auctions")
 	{
 		route.GET("/", auctionHandler.GetAuctions)
+		route.GET("/:id", auctionHandler.GetAuctionByID)
 	}
 }

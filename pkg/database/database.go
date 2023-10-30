@@ -178,8 +178,6 @@ func (d *Database) applyOptions(opts ...FindOption) *gorm.DB {
 
 	if len(opt.preloads) != 0 {
 		for _, preload := range opt.preloads {
-			//preload[0] = Relation name
-			//preload[1] = Condition
 			query = query.Preload(preload[0], preload[1])
 		}
 	}

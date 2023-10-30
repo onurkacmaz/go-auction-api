@@ -1,6 +1,7 @@
 package model
 
 import (
+	"auction/pkg/database"
 	"time"
 )
 
@@ -12,7 +13,7 @@ const (
 type AuctionStatus string
 
 type Auction struct {
-	ID          string        `json:"id" gorm:"unique;not null;index;primary_key"`
+	database.Model
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 	StartDate   *time.Time    `json:"start_date"`
@@ -20,7 +21,4 @@ type Auction struct {
 	Status      AuctionStatus `json:"status"`
 	Image       string        `json:"image"`
 	Artworks    []*Artwork    `json:"artworks"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
-	DeletedAt   time.Time     `json:"deleted_at"`
 }
