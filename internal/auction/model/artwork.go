@@ -18,3 +18,17 @@ type Artwork struct {
 	Bids                 []*Bid          `json:"bids"`
 	Artist               []model.Artist  `json:"artist" gorm:"many2many:artwork_artists;"`
 }
+
+type MinBid struct {
+	Amount   float64 `json:"amount"`
+	Currency string  `json:"currency"`
+}
+
+func (a *Artwork) MinBid() MinBid {
+	lastBid := a.Bids[len(a.Bids)-1]
+
+	return MinBid{
+		Amount:   lastBid.Amount + 1,
+		Currency: "USD",
+	}
+}

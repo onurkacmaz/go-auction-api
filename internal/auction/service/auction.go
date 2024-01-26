@@ -4,12 +4,13 @@ import (
 	"auction/internal/auction/dto"
 	"auction/internal/auction/model"
 	"auction/internal/auction/repository"
+	"auction/pkg/paging"
 	"errors"
 	"github.com/gin-gonic/gin"
 )
 
 type IAuctionService interface {
-	GetAuctions(c *gin.Context, req *dto.GetAuctionsReq) ([]*model.Auction, error)
+	GetAuctions(c *gin.Context, req *dto.GetAuctionsReq) ([]*model.Auction, *paging.Pagination, error)
 	GetAuctionByID(c *gin.Context, id string) (*model.Auction, error)
 }
 
@@ -23,10 +24,14 @@ func NewAuctionService(repo repository.IAuctionRepository) *AuctionService {
 	}
 }
 
-func (s *AuctionService) GetAuctions(c *gin.Context, req *dto.GetAuctionsReq) ([]*model.Auction, error) {
-	auctions := s.repo.GetAuctions(c, req)
+func (s *AuctionService) GetAuctions(c *gin.Context, req *dto.GetAuctionsReq) ([]*model.Auction, *paging.Pagination, error) {
+	auctions, pagination, err := s.repo.GetAuctions(c, req)
 
-	return auctions, nil
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return auctions, pagination, err
 }
 
 func (s *AuctionService) GetAuctionByID(c *gin.Context, id string) (*model.Auction, error) {

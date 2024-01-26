@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"auction/pkg/paging"
 	"time"
 )
 
@@ -18,11 +19,14 @@ type Auction struct {
 }
 
 type GetAuctionsReq struct {
-	Preload bool `form:"preload" default:"true"`
+	Preload bool  `form:"preload" default:"true"`
+	Page    int64 `form:"page" default:"1"`
+	Limit   int64 `form:"limit" default:"10"`
 }
 
 type GetAuctionsRes struct {
-	Auctions []*Auction `json:"auctions"`
+	Pagination *paging.Pagination `json:"pagination"`
+	Auctions   []*Auction         `json:"auctions"`
 }
 
 type GetAuctionByIDReq struct {

@@ -4,12 +4,14 @@ import (
 	"auction/internal/auction/dto"
 	"auction/internal/auction/model"
 	"auction/pkg/database"
+	"auction/pkg/paging"
 	"context"
 )
 
 type IAuctionRepository interface {
-	GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) []*model.Auction
+	GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) ([]*model.Auction, *paging.Pagination, error)
 	GetAuctionByID(ctx context.Context, id string) *model.Auction
+	UpdateAuction(ctx context.Context, auction *model.Auction) (*model.Auction, error)
 }
 
 type AuctionRepo struct {
@@ -20,8 +22,7 @@ func NewAuctionRepository(db database.IDatabase) *AuctionRepo {
 	return &AuctionRepo{db: db}
 }
 
-func (r *AuctionRepo) GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) []*model.Auction {
-	var auctions []*model.Auction
+func (r *AuctionRepo) GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) ([]*model.Auction, *paging.Pagination, error) {
 
 	var opts []database.FindOption
 
@@ -37,13 +38,21 @@ func (r *AuctionRepo) GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) 
 	opts = append(opts, database.WithQuery(database.NewQuery("status = ?", model.AuctionStatusActive)))
 	opts = append(opts, database.WithOrder("id desc"))
 
+	var total int64
+	if err := r.db.Count(ctx, &model.Auction{}, &total, opts...); err != nil {
+		return nil, nil, err
+	}
+
+	pagination := paging.New(req.Page, req.Limit, total)
+
+	var auctions []*model.Auction
 	r.db.Find(
 		ctx,
 		&auctions,
 		opts...,
 	)
 
-	return auctions
+	return auctions, pagination, nil
 }
 
 func (r AuctionRepo) GetAuctionByID(ctx context.Context, id string) *model.Auction {
@@ -66,4 +75,13 @@ func (r AuctionRepo) GetAuctionByID(ctx context.Context, id string) *model.Aucti
 	)
 
 	return &auction
+}
+
+func (r AuctionRepo) UpdateAuction(ctx context.Context, auction *model.Auction) (*model.Auction, error) {
+	err := r.db.Update(ctx, auction)
+	if err != nil {
+		return nil, err
+	}
+
+	return auction, nil
 }

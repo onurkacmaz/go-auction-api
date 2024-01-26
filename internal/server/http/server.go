@@ -2,6 +2,7 @@ package http
 
 import (
 	auctionHttp "auction/internal/auction/port/http"
+	bidHttp "auction/internal/bid/port/http"
 	userHttp "auction/internal/user/port/http"
 	"auction/pkg/config"
 	database "auction/pkg/database"
@@ -21,6 +22,10 @@ type Server struct {
 }
 
 func NewServer(cfg *config.Schema, db database.IDatabase, cache redis.IRedis) *Server {
+	if cfg.Environment == config.ProductionEnv {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	return &Server{
 		engine: gin.Default(),
 		cfg:    cfg,
@@ -31,9 +36,6 @@ func NewServer(cfg *config.Schema, db database.IDatabase, cache redis.IRedis) *S
 
 func (s *Server) Run() error {
 	_ = s.engine.SetTrustedProxies(nil)
-	if s.cfg.Environment == config.ProductionEnv {
-		gin.SetMode(gin.ReleaseMode)
-	}
 
 	if err := s.MapRoutes(); err != nil {
 		log.Fatalf("MapRoutes Error: %v", err)
@@ -52,13 +54,14 @@ func (s *Server) Run() error {
 	return nil
 }
 
-func (s Server) GetEngine() *gin.Engine {
+func (s *Server) GetEngine() *gin.Engine {
 	return s.engine
 }
 
-func (s Server) MapRoutes() error {
+func (s *Server) MapRoutes() error {
 	v1 := s.engine.Group("/api/v1")
 	userHttp.Routes(v1, s.db)
 	auctionHttp.Routes(v1, s.db)
+	bidHttp.Routes(v1, s.db)
 	return nil
 }

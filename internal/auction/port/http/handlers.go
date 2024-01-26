@@ -26,16 +26,17 @@ func (h *AuctionHandler) GetAuctions(c *gin.Context) {
 		return
 	}
 
-	auctions, err := h.service.GetAuctions(c, &req)
-
-	var res dto.GetAuctionsRes
-	utils.Copy(&res.Auctions, &auctions)
+	auctions, pagination, err := h.service.GetAuctions(c, &req)
 
 	if err != nil {
 		log.Println("Failed to get auctions ", err)
 		response.Error(c, http.StatusBadRequest, err, err.Error())
 		return
 	}
+
+	var res dto.GetAuctionsRes
+	res.Pagination = pagination
+	utils.Copy(&res.Auctions, &auctions)
 
 	response.JSON(c, http.StatusOK, res)
 }

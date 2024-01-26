@@ -4,6 +4,7 @@ import (
 	artistModel "auction/internal/artist/model"
 	artworkGroupModel "auction/internal/artwork_group/model"
 	auctionModel "auction/internal/auction/model"
+	bidModel "auction/internal/bid/model"
 	httpServer "auction/internal/server/http"
 	userModel "auction/internal/user/model"
 	userFavoriteModel "auction/internal/user_favorite/model"
@@ -15,9 +16,9 @@ import (
 )
 
 func main() {
-	config := config.LoadConfig()
+	cfg := config.LoadConfig()
 
-	db, err := database.NewDatabase(config.DatabaseURI)
+	db, err := database.NewDatabase(cfg.DatabaseURI)
 
 	if err != nil {
 		log.Fatal("Error connecting to database", err)
@@ -33,18 +34,19 @@ func main() {
 		&artworkGroupModel.ArtworkGroup{},
 		&userFavoriteModel.UserFavorite{},
 		&userFollowModel.UserFollow{},
+		&bidModel.Bid{},
 	)
 	if err != nil {
 		log.Fatal("Database migration fail", err)
 	}
 
 	cache := redis.New(redis.Config{
-		Address:  config.RedisURI,
-		Password: config.RedisPassword,
-		Database: config.RedisDB,
+		Address:  cfg.RedisURI,
+		Password: cfg.RedisPassword,
+		Database: cfg.RedisDB,
 	})
 
-	httpSvr := httpServer.NewServer(config, db, cache)
+	httpSvr := httpServer.NewServer(cfg, db, cache)
 	if err = httpSvr.Run(); err != nil {
 		log.Fatal(err)
 	}

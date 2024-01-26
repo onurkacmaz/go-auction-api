@@ -1,6 +1,7 @@
 package model
 
 import (
+	"auction/pkg/database"
 	"auction/pkg/utils"
 	"encoding/json"
 	"github.com/google/uuid"
@@ -10,16 +11,13 @@ import (
 )
 
 type User struct {
-	ID              string         `json:"id" gorm:"unique;not null;index;primary_key"`
+	database.Model
 	Email           string         `json:"email" gorm:"unique;not null;index:idx_user_email"`
 	Password        string         `json:"password"`
 	Roles           datatypes.JSON `json:"roles" gorm:"type:json;not null;"`
 	PhoneNumber     string         `json:"phone_number"`
 	EmailVerifiedAt *time.Time     `json:"email_verified_at"`
 	BirthDate       *time.Time     `json:"birth_date"`
-	CreatedAt       time.Time      `json:"created_at"`
-	UpdatedAt       time.Time      `json:"updated_at"`
-	DeletedAt       *time.Time     `json:"deleted_at" gorm:"index"`
 }
 
 const (

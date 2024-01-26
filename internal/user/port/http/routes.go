@@ -13,7 +13,7 @@ func Routes(r *gin.RouterGroup, db database.IDatabase) {
 	userService := service.NewUserService(userRepo)
 	userHandler := NewUserHandler(userService)
 
-	authMiddleware := middleware.JWTAuth()
+	authMiddleware := middleware.JWTAuth(db)
 	refreshAuthMiddleware := middleware.JWTRefresh()
 	authRoute := r.Group("/auth")
 	{

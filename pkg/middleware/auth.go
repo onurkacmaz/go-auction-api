@@ -1,34 +1,84 @@
 package middleware
 
 import (
+	"auction/internal/user/model"
+	"auction/internal/user/repository"
+	"auction/pkg/database"
 	"auction/pkg/jtoken"
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func JWTAuth() gin.HandlerFunc {
-	return JWT(jtoken.AccessTokenType)
+type IUserService interface {
+	GetUserByID(ctx context.Context, id string) (*model.User, error)
+}
+
+type UserService struct {
+	repo repository.IUserRepository
+}
+
+func NewUserService(repo repository.IUserRepository) *UserService {
+	return &UserService{
+		repo: repo,
+	}
+}
+
+func JWTAuth(db database.IDatabase) gin.HandlerFunc {
+	return JWT(jtoken.AccessTokenType, db)
 }
 
 func JWTRefresh() gin.HandlerFunc {
-	return JWT(jtoken.RefreshTokenType)
+	return JWT(jtoken.RefreshTokenType, nil)
 }
 
-func JWT(tokenType string) gin.HandlerFunc {
+func (s *UserService) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+	return s.repo.GetUserByID(ctx, id)
+}
+
+type Response struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+func JWT(tokenType string, db database.IDatabase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.JSON(http.StatusUnauthorized, nil)
+			c.JSON(http.StatusUnauthorized, Response{
+				Code:    http.StatusUnauthorized,
+				Message: "Unauthorized",
+			})
 			c.Abort()
 			return
 		}
 
 		payload, err := jtoken.ValidateToken(token)
 		if err != nil || payload == nil || payload["type"] != tokenType {
-			c.JSON(http.StatusUnauthorized, nil)
+			c.JSON(http.StatusUnauthorized, Response{
+				Code:    http.StatusUnauthorized,
+				Message: "Unauthorized",
+			})
 			c.Abort()
 			return
 		}
+
+		if db != nil {
+			userService := NewUserService(repository.NewUserRepository(db))
+			user, _ := userService.GetUserByID(c, payload["id"].(string))
+
+			if user == nil {
+				c.JSON(http.StatusUnauthorized, Response{
+					Code:    http.StatusUnauthorized,
+					Message: "Unauthorized",
+				})
+				c.Abort()
+				return
+			}
+
+			c.Set("user", user)
+		}
+
 		c.Set("userId", payload["id"])
 		c.Set("role", payload["role"])
 		c.Next()
