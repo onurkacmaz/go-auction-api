@@ -12,6 +12,7 @@ type IAuctionRepository interface {
 	GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) ([]*model.Auction, *paging.Pagination, error)
 	GetAuctionByID(ctx context.Context, id string) *model.Auction
 	UpdateAuction(ctx context.Context, auction *model.Auction) (*model.Auction, error)
+	CreateAuction(ctx context.Context, auction *model.Auction) (*model.Auction, error)
 }
 
 type AuctionRepo struct {
@@ -36,7 +37,7 @@ func (r *AuctionRepo) GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) 
 	}
 
 	opts = append(opts, database.WithQuery(database.NewQuery("status = ?", model.AuctionStatusActive)))
-	opts = append(opts, database.WithOrder("id desc"))
+	opts = append(opts, database.WithOrder("created_at desc"))
 
 	var total int64
 	if err := r.db.Count(ctx, &model.Auction{}, &total, opts...); err != nil {
@@ -46,7 +47,7 @@ func (r *AuctionRepo) GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) 
 	pagination := paging.New(req.Page, req.Limit, total)
 
 	var auctions []*model.Auction
-	r.db.Find(
+	_ = r.db.Find(
 		ctx,
 		&auctions,
 		opts...,
@@ -55,7 +56,7 @@ func (r *AuctionRepo) GetAuctions(ctx context.Context, req *dto.GetAuctionsReq) 
 	return auctions, pagination, nil
 }
 
-func (r AuctionRepo) GetAuctionByID(ctx context.Context, id string) *model.Auction {
+func (r *AuctionRepo) GetAuctionByID(ctx context.Context, id string) *model.Auction {
 	var auction model.Auction
 
 	var opts []database.FindOption
@@ -68,7 +69,7 @@ func (r AuctionRepo) GetAuctionByID(ctx context.Context, id string) *model.Aucti
 		{"Artworks.Artist", "deleted_at is null"},
 	}))
 
-	r.db.FindOne(
+	_ = r.db.FindOne(
 		ctx,
 		&auction,
 		opts...,
@@ -77,9 +78,17 @@ func (r AuctionRepo) GetAuctionByID(ctx context.Context, id string) *model.Aucti
 	return &auction
 }
 
-func (r AuctionRepo) UpdateAuction(ctx context.Context, auction *model.Auction) (*model.Auction, error) {
+func (r *AuctionRepo) UpdateAuction(ctx context.Context, auction *model.Auction) (*model.Auction, error) {
 	err := r.db.Update(ctx, auction)
 	if err != nil {
+		return nil, err
+	}
+
+	return auction, nil
+}
+
+func (r *AuctionRepo) CreateAuction(ctx context.Context, auction *model.Auction) (*model.Auction, error) {
+	if err := r.db.Create(ctx, auction); err != nil {
 		return nil, err
 	}
 

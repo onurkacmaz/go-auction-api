@@ -1,21 +1,22 @@
 package dto
 
 import (
+	"auction/internal/auction/model"
 	"auction/pkg/paging"
+	"mime/multipart"
 	"time"
 )
 
 type Auction struct {
-	ID          string     `json:"id"`
-	Name        string     `json:"name"`
-	Description string     `json:"description"`
-	StartDate   *time.Time `json:"start_date"`
-	EndDate     *time.Time `json:"end_date"`
-	Status      string     `json:"status"`
-	Image       string     `json:"image"`
-	Artworks    []*Artwork `json:"artworks"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	Slug        string              `json:"slug"`
+	Description string              `json:"description"`
+	StartDate   *time.Time          `json:"start_date"`
+	EndDate     *time.Time          `json:"end_date"`
+	Status      model.AuctionStatus `json:"status"`
+	Image       string              `json:"image"`
+	Artworks    []*Artwork          `json:"artworks"`
 }
 
 type GetAuctionsReq struct {
@@ -35,4 +36,13 @@ type GetAuctionByIDReq struct {
 
 type GetAuctionRes struct {
 	Auction *Auction `json:"auction"`
+}
+
+type CreateAuctionReq struct {
+	Name        string               `form:"name" binding:"required"`
+	Description string               `form:"description" binding:"required"`
+	StartDate   string               `form:"start_date" binding:"required"`
+	EndDate     string               `form:"end_date" binding:"required"`
+	Status      model.AuctionStatus  `form:"status" binding:"required"`
+	Image       multipart.FileHeader `form:"image" binding:"required"`
 }

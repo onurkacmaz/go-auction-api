@@ -15,6 +15,7 @@ func Routes(r *gin.RouterGroup, db database.IDatabase) {
 
 	authMiddleware := middleware.JWTAuth(db)
 	refreshAuthMiddleware := middleware.JWTRefresh()
+
 	authRoute := r.Group("/auth")
 	{
 		authRoute.POST("/register", userHandler.Register)

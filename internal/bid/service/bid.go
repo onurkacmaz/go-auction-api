@@ -61,12 +61,12 @@ func (s *Service) CreateBid(ctx context.Context, user userModel.User, artwork ar
 
 	if auction.IsRangeEndDateIsLastXMins(5) == true {
 		auction := auction.ExtendEndDate(5)
-		s.auctionRepo.UpdateAuction(ctx, auction)
+		_, _ = s.auctionRepo.UpdateAuction(ctx, auction)
 	}
 
 	artwork.EndPrice = bid.Amount
 
-	s.artworkRepo.UpdateArtwork(ctx, &artwork)
+	_, _ = s.artworkRepo.UpdateArtwork(ctx, &artwork)
 
 	return bid, nil
 }

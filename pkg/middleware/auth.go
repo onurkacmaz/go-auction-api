@@ -5,9 +5,11 @@ import (
 	"auction/internal/user/repository"
 	"auction/pkg/database"
 	"auction/pkg/jtoken"
+	"auction/pkg/utils"
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	_ "reflect"
 )
 
 type IUserService interface {
@@ -79,8 +81,30 @@ func JWT(tokenType string, db database.IDatabase) gin.HandlerFunc {
 			c.Set("user", user)
 		}
 
+		var roles []string
+		for _, role := range payload["roles"].([]interface{}) {
+			if str, ok := role.(string); ok {
+				roles = append(roles, str)
+			}
+		}
+
 		c.Set("userId", payload["id"])
-		c.Set("role", payload["role"])
+		c.Set("roles", roles)
+		c.Next()
+	}
+}
+
+func AdminAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !utils.InArray("ROLE_ADMIN", c.GetStringSlice("roles")) {
+			c.JSON(http.StatusForbidden, Response{
+				Code:    http.StatusForbidden,
+				Message: "Forbidden",
+			})
+			c.Abort()
+			return
+		}
+
 		c.Next()
 	}
 }

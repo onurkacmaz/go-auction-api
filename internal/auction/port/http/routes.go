@@ -14,9 +14,12 @@ func Routes(r *gin.RouterGroup, db database.IDatabase) {
 	auctionHandler := NewAuctionHandler(auctionService)
 
 	_ = middleware.JWTAuth(db)
+	adminMiddleware := middleware.AdminAuth()
+	authMiddleware := middleware.JWTAuth(db)
 	route := r.Group("/auctions")
 	{
 		route.GET("/", auctionHandler.GetAuctions)
 		route.GET("/:id", auctionHandler.GetAuctionByID)
+		route.POST("/", authMiddleware, adminMiddleware, auctionHandler.CreateAuction)
 	}
 }
