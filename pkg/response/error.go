@@ -1,10 +1,9 @@
 package response
 
 import (
+	"auction/pkg/config"
 	"github.com/gin-gonic/gin"
 	"strings"
-
-	"auction/pkg/config"
 )
 
 func Error(c *gin.Context, status int, err error, message string) {

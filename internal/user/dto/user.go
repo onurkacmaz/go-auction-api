@@ -5,15 +5,15 @@ import (
 )
 
 type User struct {
-	ID        string    `json:"id"`
+	ID        uint32    `json:"id"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type RegisterReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
 }
 
 type RegisterRes struct {
@@ -21,8 +21,8 @@ type RegisterRes struct {
 }
 
 type LoginReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
 }
 
 type LoginRes struct {

@@ -5,7 +5,6 @@ import (
 	"auction/internal/user/service"
 	"auction/pkg/response"
 	"auction/pkg/utils"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -23,7 +22,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	var req dto.LoginReq
 	if err := c.ShouldBindJSON(&req); c.Request.Body == nil || err != nil {
 		log.Println("Failed to get body ", err)
-		response.Error(c, http.StatusBadRequest, err, "Invalid parameters")
+		response.Error(c, http.StatusBadRequest, err, "Invalid credentials")
 		return
 	}
 
@@ -62,13 +61,9 @@ func (h *UserHandler) Register(c *gin.Context) {
 }
 
 func (h *UserHandler) GetMe(c *gin.Context) {
-	userID := c.GetString("userId")
-	if userID == "" {
-		response.Error(c, http.StatusUnauthorized, errors.New("unauthorized"), "Unauthorized")
-		return
-	}
+	userID := c.GetUint("userId")
 
-	user, err := h.service.GetUserByID(c, userID)
+	user, err := h.service.GetUserByID(c, uint32(userID))
 	if err != nil {
 		log.Println(err.Error())
 		response.Error(c, http.StatusBadRequest, err, err.Error())
@@ -81,13 +76,9 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 }
 
 func (h *UserHandler) RefreshToken(c *gin.Context) {
-	userID := c.GetString("userId")
-	if userID == "" {
-		response.Error(c, http.StatusUnauthorized, errors.New("unauthorized"), "Unauthorized")
-		return
-	}
+	userID := c.GetUint("userId")
 
-	accessToken, err := h.service.RefreshToken(c, userID)
+	accessToken, err := h.service.RefreshToken(c, uint32(userID))
 	if err != nil {
 		log.Println("Failed to refresh token", err)
 		response.Error(c, http.StatusBadRequest, err, err.Error())
@@ -108,8 +99,8 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetString("userId")
-	err := h.service.ChangePassword(c, userID, &req)
+	userID := c.GetUint("userId")
+	err := h.service.ChangePassword(c, uint32(userID), &req)
 	if err != nil {
 		log.Println(err.Error())
 		response.Error(c, http.StatusBadRequest, err, err.Error())

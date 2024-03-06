@@ -34,7 +34,7 @@ func JWTRefresh() gin.HandlerFunc {
 	return JWT(jtoken.RefreshTokenType, nil)
 }
 
-func (s *UserService) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+func (s *UserService) GetUserByID(ctx context.Context, id uint32) (*model.User, error) {
 	return s.repo.GetUserByID(ctx, id)
 }
 
@@ -67,7 +67,7 @@ func JWT(tokenType string, db database.IDatabase) gin.HandlerFunc {
 
 		if db != nil {
 			userService := NewUserService(repository.NewUserRepository(db))
-			user, _ := userService.GetUserByID(c, payload["id"].(string))
+			user, _ := userService.GetUserByID(c, uint32(payload["id"].(float64)))
 
 			if user == nil {
 				c.JSON(http.StatusUnauthorized, Response{

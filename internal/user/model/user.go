@@ -28,7 +28,7 @@ const (
 type RoleJSON []string
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {
-	u.ID = uuid.New().String()
+	u.ID = uuid.New().ID()
 	u.Password = utils.HashPassword([]byte(u.Password))
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()

@@ -1,13 +1,13 @@
 package dto
 
 type Bid struct {
-	ID     string  `json:"id"`
+	ID     uint32  `json:"id"`
 	Amount float64 `json:"amount"`
 }
 
 type CreateBidRequest struct {
 	Amount    float64 `json:"amount"`
-	ArtworkID string  `json:"artwork_id"`
+	ArtworkID uint32  `json:"artwork_id"`
 }
 
 type CreateBidResponse struct {

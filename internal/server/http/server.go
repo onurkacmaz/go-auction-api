@@ -1,6 +1,7 @@
 package http
 
 import (
+	artworkHttp "auction/internal/artwork/port/http"
 	auctionHttp "auction/internal/auction/port/http"
 	bidHttp "auction/internal/bid/port/http"
 	userHttp "auction/internal/user/port/http"
@@ -37,6 +38,16 @@ func NewServer(cfg *config.Schema, db database.IDatabase, cache redis.IRedis) *S
 func (s *Server) Run() error {
 	_ = s.engine.SetTrustedProxies(nil)
 
+	s.engine.Use(func(context *gin.Context) {
+		context.Header("Connection", "keep-alive")
+		context.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		context.Header("Access-Control-Allow-Credentials", "true")
+		context.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, DELETE, PUT")
+		context.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+
+		context.Next()
+	})
+
 	if err := s.MapRoutes(); err != nil {
 		log.Fatalf("MapRoutes Error: %v", err)
 	}
@@ -60,8 +71,10 @@ func (s *Server) GetEngine() *gin.Engine {
 
 func (s *Server) MapRoutes() error {
 	v1 := s.engine.Group("/api/v1")
+
 	userHttp.Routes(v1, s.db)
-	auctionHttp.Routes(v1, s.db)
+	auctionHttp.Routes(v1, s.db, s.cache)
 	bidHttp.Routes(v1, s.db)
+	artworkHttp.Routes(v1, s.db, s.cache)
 	return nil
 }

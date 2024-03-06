@@ -2,6 +2,7 @@ package main
 
 import (
 	artistModel "auction/internal/artist/model"
+	artworkModel "auction/internal/artwork/model"
 	artworkGroupModel "auction/internal/artwork_group/model"
 	auctionModel "auction/internal/auction/model"
 	bidModel "auction/internal/bid/model"
@@ -27,14 +28,13 @@ func main() {
 	err = db.AutoMigrate(
 		&userModel.User{},
 		&auctionModel.Auction{},
-		&auctionModel.Artwork{},
-		&auctionModel.ArtworkImage{},
-		&auctionModel.Bid{},
+		&artworkModel.Artwork{},
+		&artworkModel.ArtworkImage{},
+		&bidModel.Bid{},
 		&artistModel.Artist{},
 		&artworkGroupModel.ArtworkGroup{},
 		&userFavoriteModel.UserFavorite{},
 		&userFollowModel.UserFollow{},
-		&bidModel.Bid{},
 	)
 	if err != nil {
 		log.Fatal("Database migration fail", err)

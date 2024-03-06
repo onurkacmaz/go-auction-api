@@ -22,9 +22,10 @@ type Schema struct {
 }
 
 const (
-	ProductionEnv      = "production"
-	DatabaseTimeout    = 5 * time.Second
-	ProductCachingTime = 1 * time.Minute
+	ProductionEnv       = "production"
+	DatabaseTimeout     = 5 * time.Second
+	AuctionsCachingTime = 1 * time.Minute
+	AuctionCachingTime  = 1 * time.Minute
 )
 
 var (

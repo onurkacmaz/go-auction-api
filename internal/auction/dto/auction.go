@@ -1,6 +1,7 @@
 package dto
 
 import (
+	artworkModel "auction/internal/artwork/model"
 	"auction/internal/auction/model"
 	"auction/pkg/paging"
 	"mime/multipart"
@@ -8,15 +9,15 @@ import (
 )
 
 type Auction struct {
-	ID          string              `json:"id"`
-	Name        string              `json:"name"`
-	Slug        string              `json:"slug"`
-	Description string              `json:"description"`
-	StartDate   *time.Time          `json:"start_date"`
-	EndDate     *time.Time          `json:"end_date"`
-	Status      model.AuctionStatus `json:"status"`
-	Image       string              `json:"image"`
-	Artworks    []*Artwork          `json:"artworks"`
+	ID          uint32                  `json:"id"`
+	Name        string                  `json:"name"`
+	Slug        string                  `json:"slug"`
+	Description string                  `json:"description"`
+	StartDate   *time.Time              `json:"start_date"`
+	EndDate     *time.Time              `json:"end_date"`
+	Status      model.AuctionStatus     `json:"status"`
+	Image       string                  `json:"image"`
+	Artworks    []*artworkModel.Artwork `json:"artworks"`
 }
 
 type GetAuctionsReq struct {
@@ -31,7 +32,7 @@ type GetAuctionsRes struct {
 }
 
 type GetAuctionByIDReq struct {
-	ID string `uri:"id" binding:"required"`
+	ID uint32 `uri:"id" binding:"required"`
 }
 
 type GetAuctionRes struct {
@@ -45,4 +46,13 @@ type CreateAuctionReq struct {
 	EndDate     string               `form:"end_date" binding:"required"`
 	Status      model.AuctionStatus  `form:"status" binding:"required"`
 	Image       multipart.FileHeader `form:"image" binding:"required"`
+}
+
+type UpdateAuctionReq struct {
+	Name        *string               `form:"name"`
+	Description *string               `form:"description"`
+	StartDate   *string               `form:"start_date"`
+	EndDate     *string               `form:"end_date"`
+	Status      *model.AuctionStatus  `form:"status"`
+	Image       *multipart.FileHeader `form:"image"`
 }

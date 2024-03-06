@@ -1,8 +1,8 @@
 package service
 
 import (
+	artworkModel "auction/internal/artwork/model"
 	artworkRepository "auction/internal/artwork/repository"
-	artworkModel "auction/internal/auction/model"
 	auctionRepository "auction/internal/auction/repository"
 	"auction/internal/bid/dto"
 	bidModel "auction/internal/bid/model"
@@ -15,7 +15,7 @@ import (
 
 type IBidService interface {
 	CreateBid(ctx context.Context, user userModel.User, artwork artworkModel.Artwork, req *dto.CreateBidRequest) (*bidModel.Bid, error)
-	GetArtworkByID(ctx context.Context, id string) *artworkModel.Artwork
+	GetArtworkByID(ctx context.Context, id uint32) *artworkModel.Artwork
 }
 
 type Service struct {
@@ -24,7 +24,7 @@ type Service struct {
 	auctionRepo auctionRepository.IAuctionRepository
 }
 
-func (s *Service) GetArtworkByID(ctx context.Context, id string) *artworkModel.Artwork {
+func (s *Service) GetArtworkByID(ctx context.Context, id uint32) *artworkModel.Artwork {
 	return s.artworkRepo.GetArtworkByID(ctx, id)
 }
 

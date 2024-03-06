@@ -15,9 +15,9 @@ import (
 type IUserService interface {
 	Login(ctx context.Context, req *dto.LoginReq) (*model.User, string, string, error)
 	Register(ctx context.Context, req *dto.RegisterReq) (*model.User, error)
-	GetUserByID(ctx context.Context, id string) (*model.User, error)
-	RefreshToken(ctx context.Context, userID string) (string, error)
-	ChangePassword(ctx context.Context, id string, req *dto.ChangePasswordReq) error
+	GetUserByID(ctx context.Context, id uint32) (*model.User, error)
+	RefreshToken(ctx context.Context, userID uint32) (string, error)
+	ChangePassword(ctx context.Context, id uint32, req *dto.ChangePasswordReq) error
 }
 
 type UserService struct {
@@ -62,20 +62,20 @@ func (s *UserService) Register(ctx context.Context, req *dto.RegisterReq) (*mode
 	return &user, nil
 }
 
-func (s *UserService) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+func (s *UserService) GetUserByID(ctx context.Context, id uint32) (*model.User, error) {
 	user, err := s.repo.GetUserByID(ctx, id)
 	if err != nil {
-		log.Printf("GetUserByID fail, id: %s, error: %s", id, err)
+		log.Printf("GetUserByID fail, id: %v, error: %s", id, err)
 		return nil, err
 	}
 
 	return user, nil
 }
 
-func (s *UserService) RefreshToken(ctx context.Context, userID string) (string, error) {
+func (s *UserService) RefreshToken(ctx context.Context, userID uint32) (string, error) {
 	user, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
-		log.Printf("RefreshToken.GetUserByID fail, id: %s, error: %s", userID, err)
+		log.Printf("RefreshToken.GetUserByID fail, id: %v, error: %s", userID, err)
 		return "", err
 	}
 
@@ -88,10 +88,10 @@ func (s *UserService) RefreshToken(ctx context.Context, userID string) (string, 
 	return accessToken, nil
 }
 
-func (s *UserService) ChangePassword(ctx context.Context, id string, req *dto.ChangePasswordReq) error {
+func (s *UserService) ChangePassword(ctx context.Context, id uint32, req *dto.ChangePasswordReq) error {
 	user, err := s.repo.GetUserByID(ctx, id)
 	if err != nil {
-		log.Printf("ChangePassword.GetUserByID fail, id: %s, error: %s", id, err)
+		log.Printf("ChangePassword.GetUserByID fail, id: %v, error: %s", id, err)
 		return err
 	}
 
@@ -102,7 +102,7 @@ func (s *UserService) ChangePassword(ctx context.Context, id string, req *dto.Ch
 	user.Password = utils.HashPassword([]byte(req.NewPassword))
 	err = s.repo.Update(ctx, user)
 	if err != nil {
-		log.Printf("ChangePassword.Update fail, id: %s, error: %s", id, err)
+		log.Printf("ChangePassword.Update fail, id: %v, error: %s", id, err)
 		return err
 	}
 

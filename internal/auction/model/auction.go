@@ -1,6 +1,7 @@
 package model
 
 import (
+	artworkModel "auction/internal/artwork/model"
 	"auction/pkg/database"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -16,19 +17,25 @@ type AuctionStatus string
 
 type Auction struct {
 	database.Model
-	Name        string        `json:"name"`
-	Slug        string        `json:"slug"`
-	Description string        `json:"description"`
-	StartDate   *time.Time    `json:"start_date"`
-	EndDate     *time.Time    `json:"end_date"`
-	Status      AuctionStatus `json:"status"`
-	Image       string        `json:"image"`
-	Artworks    []*Artwork    `json:"artworks"`
+	Name        string                  `json:"name"`
+	Slug        string                  `json:"slug"`
+	Description string                  `json:"description"`
+	StartDate   *time.Time              `json:"start_date"`
+	EndDate     *time.Time              `json:"end_date"`
+	Status      AuctionStatus           `json:"status"`
+	Image       string                  `json:"image"`
+	Artworks    []*artworkModel.Artwork `json:"artworks" gorm:"many2many:artworks;"`
 }
 
 func (a *Auction) BeforeCreate(tx *gorm.DB) error {
-	a.ID = uuid.New().String()
+	a.ID = uuid.New().ID()
 	a.CreatedAt = time.Now()
+	a.UpdatedAt = time.Now()
+
+	return nil
+}
+
+func (a *Auction) BeforeUpdate(tx *gorm.DB) error {
 	a.UpdatedAt = time.Now()
 
 	return nil
