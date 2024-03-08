@@ -3,12 +3,14 @@ package http
 import (
 	"auction/internal/artwork/dto"
 	"auction/internal/artwork/service"
+	"auction/pkg/config"
 	"auction/pkg/redis"
 	"auction/pkg/response"
 	"auction/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type ArtworkHandler struct {
@@ -64,4 +66,27 @@ func (h *ArtworkHandler) UpdateAuction(c *gin.Context) {
 	utils.Copy(&res.Artwork, &artwork)
 
 	response.JSON(c, http.StatusOK, res)
+}
+
+func (h *ArtworkHandler) GetArtworkByID(c *gin.Context) {
+	var res dto.GetArtworkRes
+
+	cacheKey := c.Request.URL.RequestURI()
+	if err := h.cache.Get(cacheKey, &res.Artwork); err == nil {
+		response.JSON(c, http.StatusOK, res)
+		return
+	}
+
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 32)
+	artwork, err := h.service.GetArtworkByID(c, uint32(id))
+
+	if err != nil {
+		log.Println("Failed to get artwork ", err)
+		response.JSON(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	utils.Copy(&res.Artwork, &artwork)
+	response.JSON(c, http.StatusOK, res)
+	_ = h.cache.SetWithExpiration(cacheKey, res.Artwork, config.ArtworkCachingTime)
 }

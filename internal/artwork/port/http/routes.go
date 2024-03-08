@@ -21,5 +21,6 @@ func Routes(r *gin.RouterGroup, db database.IDatabase, cache redis.IRedis) {
 	{
 		route.POST("/", authMiddleware, adminMiddleware, artworkHandler.CreateArtwork)
 		route.PUT("/:id", authMiddleware, adminMiddleware, artworkHandler.UpdateAuction)
+		route.GET("/:id", artworkHandler.GetArtworkByID)
 	}
 }

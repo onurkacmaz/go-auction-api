@@ -136,7 +136,7 @@ func (d *Database) FindOne(ctx context.Context, result any, opts ...FindOption) 
 	defer cancel()
 
 	query := d.applyOptions(opts...)
-	if err := query.First(result).Error; err != nil {
+	if err := query.Debug().First(result).Error; err != nil {
 		return err
 	}
 

@@ -13,10 +13,10 @@ import (
 )
 
 type IUserService interface {
-	Login(ctx context.Context, req *dto.LoginReq) (*model.User, string, string, error)
+	Login(ctx context.Context, req *dto.LoginReq) (*model.User, string, string, int64, error)
 	Register(ctx context.Context, req *dto.RegisterReq) (*model.User, error)
 	GetUserByID(ctx context.Context, id uint32) (*model.User, error)
-	RefreshToken(ctx context.Context, userID uint32) (string, error)
+	RefreshToken(ctx context.Context, userID uint32) (string, int64, error)
 	ChangePassword(ctx context.Context, id uint32, req *dto.ChangePasswordReq) error
 }
 
@@ -30,15 +30,15 @@ func NewUserService(repo repository.IUserRepository) *UserService {
 	}
 }
 
-func (s *UserService) Login(ctx context.Context, req *dto.LoginReq) (*model.User, string, string, error) {
+func (s *UserService) Login(ctx context.Context, req *dto.LoginReq) (*model.User, string, string, int64, error) {
 	user, err := s.repo.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		log.Printf("Login.GetUserByEmail fail, email: %s, error: %s", req.Email, err)
-		return nil, "", "", err
+		return nil, "", "", 0, err
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return nil, "", "", errors.New("invalid credentials")
+		return nil, "", "", 0, errors.New("invalid credentials")
 	}
 
 	tokenData := map[string]interface{}{
@@ -46,9 +46,9 @@ func (s *UserService) Login(ctx context.Context, req *dto.LoginReq) (*model.User
 		"email": user.Email,
 		"roles": user.Roles,
 	}
-	accessToken := jtoken.GenerateAccessToken(tokenData)
-	refreshToken := jtoken.GenerateRefreshToken(tokenData)
-	return user, accessToken, refreshToken, nil
+	accessToken, expiresIn := jtoken.GenerateAccessToken(tokenData)
+	refreshToken, _ := jtoken.GenerateRefreshToken(tokenData)
+	return user, accessToken, refreshToken, expiresIn, nil
 }
 
 func (s *UserService) Register(ctx context.Context, req *dto.RegisterReq) (*model.User, error) {
@@ -72,11 +72,11 @@ func (s *UserService) GetUserByID(ctx context.Context, id uint32) (*model.User, 
 	return user, nil
 }
 
-func (s *UserService) RefreshToken(ctx context.Context, userID uint32) (string, error) {
+func (s *UserService) RefreshToken(ctx context.Context, userID uint32) (string, int64, error) {
 	user, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
 		log.Printf("RefreshToken.GetUserByID fail, id: %v, error: %s", userID, err)
-		return "", err
+		return "", 0, err
 	}
 
 	tokenData := map[string]interface{}{
@@ -84,8 +84,8 @@ func (s *UserService) RefreshToken(ctx context.Context, userID uint32) (string, 
 		"email": user.Email,
 		"roles": user.Roles,
 	}
-	accessToken := jtoken.GenerateAccessToken(tokenData)
-	return accessToken, nil
+	accessToken, expiresIn := jtoken.GenerateAccessToken(tokenData)
+	return accessToken, expiresIn, nil
 }
 
 func (s *UserService) ChangePassword(ctx context.Context, id uint32, req *dto.ChangePasswordReq) error {

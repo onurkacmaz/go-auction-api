@@ -66,7 +66,7 @@ func (r *AuctionRepo) GetAuctionByID(ctx context.Context, id uint32) *model.Auct
 
 	opts = append(opts, database.WithQuery(database.NewQuery("id = ?", id)))
 	opts = append(opts, database.WithPreload([][]string{
-		{"Artworks", "status = active"},
+		{"Artworks", "status = 'active'"},
 		{"Artworks.Images", "deleted_at is null"},
 		{"Artworks.Bids", "deleted_at is null"},
 		{"Artworks.Artist", "deleted_at is null"},

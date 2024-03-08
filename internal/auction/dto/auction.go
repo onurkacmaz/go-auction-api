@@ -1,7 +1,7 @@
 package dto
 
 import (
-	artworkModel "auction/internal/artwork/model"
+	artworkDto "auction/internal/artwork/dto"
 	"auction/internal/auction/model"
 	"auction/pkg/paging"
 	"mime/multipart"
@@ -9,15 +9,15 @@ import (
 )
 
 type Auction struct {
-	ID          uint32                  `json:"id"`
-	Name        string                  `json:"name"`
-	Slug        string                  `json:"slug"`
-	Description string                  `json:"description"`
-	StartDate   *time.Time              `json:"start_date"`
-	EndDate     *time.Time              `json:"end_date"`
-	Status      model.AuctionStatus     `json:"status"`
-	Image       string                  `json:"image"`
-	Artworks    []*artworkModel.Artwork `json:"artworks"`
+	ID          uint32                `json:"id"`
+	Name        string                `json:"name"`
+	Slug        string                `json:"slug"`
+	Description string                `json:"description"`
+	StartDate   *time.Time            `json:"start_date"`
+	EndDate     *time.Time            `json:"end_date"`
+	Status      model.AuctionStatus   `json:"status"`
+	Image       string                `json:"image"`
+	Artworks    []*artworkDto.Artwork `json:"artworks"`
 }
 
 type GetAuctionsReq struct {

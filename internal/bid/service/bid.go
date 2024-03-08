@@ -15,7 +15,7 @@ import (
 
 type IBidService interface {
 	CreateBid(ctx context.Context, user userModel.User, artwork artworkModel.Artwork, req *dto.CreateBidRequest) (*bidModel.Bid, error)
-	GetArtworkByID(ctx context.Context, id uint32) *artworkModel.Artwork
+	GetArtworkByID(ctx context.Context, id uint32) (*artworkModel.Artwork, error)
 }
 
 type Service struct {
@@ -24,7 +24,7 @@ type Service struct {
 	auctionRepo auctionRepository.IAuctionRepository
 }
 
-func (s *Service) GetArtworkByID(ctx context.Context, id uint32) *artworkModel.Artwork {
+func (s *Service) GetArtworkByID(ctx context.Context, id uint32) (*artworkModel.Artwork, error) {
 	return s.artworkRepo.GetArtworkByID(ctx, id)
 }
 

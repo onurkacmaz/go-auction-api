@@ -7,7 +7,7 @@ import (
 )
 
 type IArtworkRepository interface {
-	GetArtworkByID(ctx context.Context, id uint32) *model.Artwork
+	GetArtworkByID(ctx context.Context, id uint32) (*model.Artwork, error)
 	CreateArtwork(ctx context.Context, artwork *model.Artwork) (*model.Artwork, error)
 	UpdateArtwork(ctx context.Context, artwork *model.Artwork) (*model.Artwork, error)
 }
@@ -36,12 +36,13 @@ func (a ArtworkRepo) CreateArtwork(ctx context.Context, artwork *model.Artwork) 
 	return artwork, nil
 }
 
-func (a ArtworkRepo) GetArtworkByID(ctx context.Context, id uint32) *model.Artwork {
+func (a ArtworkRepo) GetArtworkByID(ctx context.Context, id uint32) (*model.Artwork, error) {
 	var opts []database.FindOption
 
-	opts = append(opts, database.WithQuery(database.NewQuery("id = ? and status = 1", id)))
+	opts = append(opts, database.WithQuery(database.NewQuery("id = ?", id), database.NewQuery("status = ?", "active")))
 
 	opts = append(opts, database.WithPreload([][]string{
+		{"Images", "deleted_at is null"},
 		{"Bids", "deleted_at is null order by created_at asc"},
 	}))
 
@@ -49,8 +50,8 @@ func (a ArtworkRepo) GetArtworkByID(ctx context.Context, id uint32) *model.Artwo
 	err := a.db.FindOne(ctx, &artwork, opts...)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return &artwork
+	return &artwork, nil
 }

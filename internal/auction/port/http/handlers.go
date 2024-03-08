@@ -50,7 +50,7 @@ func (h *AuctionHandler) GetAuctions(c *gin.Context) {
 	utils.Copy(&res.Auctions, &auctions)
 
 	response.JSON(c, http.StatusOK, res)
-	//_ = h.cache.SetWithExpiration(cacheKey, res, config.AuctionsCachingTime)
+	_ = h.cache.SetWithExpiration(cacheKey, res, config.AuctionsCachingTime)
 }
 
 func (h *AuctionHandler) GetAuctionByID(c *gin.Context) {

@@ -28,7 +28,7 @@ func (h *BidHandler) CreateBid(c *gin.Context) {
 		return
 	}
 
-	artwork := h.service.GetArtworkByID(c, req.ArtworkID)
+	artwork, _ := h.service.GetArtworkByID(c, req.ArtworkID)
 
 	if artwork == nil {
 		response.Error(c, http.StatusBadRequest, nil, "Artwork not found")
@@ -44,8 +44,6 @@ func (h *BidHandler) CreateBid(c *gin.Context) {
 		response.Error(c, http.StatusBadRequest, err, err.Error())
 		return
 	}
-
-	artwork = h.service.GetArtworkByID(c, req.ArtworkID)
 
 	var res dto.CreateBidResponse
 	utils.Copy(&res.Bid, &bid)

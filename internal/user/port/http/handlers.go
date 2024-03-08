@@ -26,7 +26,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, accessToken, refreshToken, err := h.service.Login(c, &req)
+	user, accessToken, refreshToken, expiresIn, err := h.service.Login(c, &req)
 	if err != nil {
 		log.Println("Failed to login ", err)
 		response.Error(c, http.StatusBadRequest, err, err.Error())
@@ -37,6 +37,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	utils.Copy(&res.User, &user)
 	res.AccessToken = accessToken
 	res.RefreshToken = refreshToken
+	res.ExpiresIn = expiresIn
 	response.JSON(c, http.StatusOK, res)
 }
 
@@ -78,7 +79,7 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 func (h *UserHandler) RefreshToken(c *gin.Context) {
 	userID := c.GetUint("userId")
 
-	accessToken, err := h.service.RefreshToken(c, uint32(userID))
+	accessToken, expiresIn, err := h.service.RefreshToken(c, uint32(userID))
 	if err != nil {
 		log.Println("Failed to refresh token", err)
 		response.Error(c, http.StatusBadRequest, err, err.Error())
@@ -87,6 +88,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 
 	res := dto.RefreshTokenRes{
 		AccessToken: accessToken,
+		ExpiresIn:   expiresIn,
 	}
 	response.JSON(c, http.StatusOK, res)
 }

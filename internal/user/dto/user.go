@@ -29,10 +29,12 @@ type LoginRes struct {
 	User         User   `json:"user"`
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int64  `json:"expires_in"`
 }
 
 type RefreshTokenRes struct {
 	AccessToken string `json:"access_token"`
+	ExpiresIn   int64  `json:"expires_in"`
 }
 
 type ChangePasswordReq struct {

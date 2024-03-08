@@ -2,6 +2,7 @@ package model
 
 import (
 	artworkModel "auction/internal/artwork/model"
+	bidModel "auction/internal/bid/model"
 	"auction/pkg/database"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -24,7 +25,8 @@ type Auction struct {
 	EndDate     *time.Time              `json:"end_date"`
 	Status      AuctionStatus           `json:"status"`
 	Image       string                  `json:"image"`
-	Artworks    []*artworkModel.Artwork `json:"artworks" gorm:"many2many:artworks;"`
+	Artworks    []*artworkModel.Artwork `json:"artworks" gorm:"one2many:artworks;"`
+	Bids        []*bidModel.Bid         `json:"bids" gorm:"many2many:bids;"`
 }
 
 func (a *Auction) BeforeCreate(tx *gorm.DB) error {

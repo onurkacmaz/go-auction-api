@@ -12,6 +12,7 @@ import (
 type IArtworkService interface {
 	CreateArtwork(c *gin.Context, req *dto.CreateArtworkReq) (*model.Artwork, error)
 	UpdateArtwork(c *gin.Context, id uint32, req *dto.UpdateArtworkReq) (*model.Artwork, error)
+	GetArtworkByID(c *gin.Context, id uint32) (*model.Artwork, error)
 }
 
 type ArtworkService struct {
@@ -24,7 +25,7 @@ func NewArtworkService(repo repository.IArtworkRepository) *ArtworkService {
 	}
 }
 
-func (s *ArtworkService) GetArtworkByID(c *gin.Context, id uint32) *model.Artwork {
+func (s *ArtworkService) GetArtworkByID(c *gin.Context, id uint32) (*model.Artwork, error) {
 	return s.repo.GetArtworkByID(c, id)
 }
 

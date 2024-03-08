@@ -26,6 +26,7 @@ const (
 	DatabaseTimeout     = 5 * time.Second
 	AuctionsCachingTime = 1 * time.Minute
 	AuctionCachingTime  = 1 * time.Minute
+	ArtworkCachingTime  = 1 * time.Minute
 )
 
 var (
