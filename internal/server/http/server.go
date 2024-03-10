@@ -43,7 +43,7 @@ func (s *Server) Run() error {
 		context.Header("Access-Control-Allow-Origin", "http://localhost:3000")
 		context.Header("Access-Control-Allow-Credentials", "true")
 		context.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, DELETE, PUT")
-		context.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		context.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Accept, Origin, Cache-Control, X-Requested-With")
 
 		context.Next()
 	})

@@ -20,6 +20,6 @@ func Routes(r *gin.RouterGroup, db database.IDatabase) {
 	authMiddleware := middleware.JWTAuth(db)
 	route := r.Group("/bids")
 	{
-		route.POST("/", authMiddleware, bidHandler.CreateBid)
+		route.POST("", authMiddleware, bidHandler.CreateBid)
 	}
 }
